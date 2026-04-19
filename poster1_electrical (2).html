@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Poster 1 — Electrical System | Team 22</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap');
+
+  /* ── EDIT BAR ── */
+  #edit-bar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+    background: #111; border-bottom: 2px solid #F5C842;
+    padding: 7px 16px; display: flex; align-items: center; gap: 10px;
+    font-family: 'DM Mono', monospace; font-size: 10px; color: #F5C842;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.9);
+  }
+  #edit-bar b { letter-spacing: 2px; text-transform: uppercase; font-size: 10px; }
+  #edit-bar span { color: #666; font-size: 9px; }
+  #edit-bar .btns { margin-left: auto; display: flex; gap: 8px; }
+  #edit-bar button {
+    border: none; padding: 5px 12px; border-radius: 3px;
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    font-weight: 600; cursor: pointer; letter-spacing: 1px; text-transform: uppercase;
+  }
+  .btn-save { background: #F5C842; color: #000; }
+  .btn-print { background: #4CAF7D; color: #000; }
+  .btn-save:hover { background: #ffd700; }
+  .btn-print:hover { background: #66d994; }
+
+  /* ── EDITABLE ── */
+  [contenteditable] {
+    outline: none; cursor: text; border-radius: 2px;
+    transition: background 0.12s, outline 0.12s;
+  }
+  [contenteditable]:hover  { background: rgba(245,200,66,0.07); outline: 1px dashed rgba(245,200,66,0.3); }
+  [contenteditable]:focus  { background: rgba(245,200,66,0.13); outline: 1px dashed rgba(245,200,66,0.6); }
+
+  /* ── PRINT ── */
+  @media print {
+    #edit-bar { display: none !important; }
+    body { margin-top: 0 !important; }
+    @page { size: A3 landscape; margin: 7mm; }
+    [contenteditable] { outline: none !important; background: transparent !important; }
+  }
+
+  /* ── TOKENS ── */
+  :root {
+    --gold: #F5C842; --dark: #0C0C0C; --mid: #181818;
+    --panel: #202020; --accent: #FF6B2B; --text: #EEEAE4;
+    --muted: #666; --green: #4CAF7D; --blue: #4A9EFF;
+    --red: #FF4E4E; --border: #2a2a2a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--dark); color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    margin-top: 42px;
+  }
+
+  .page {
+    width: 420mm; min-height: 297mm;
+    margin: 0 auto; padding: 8mm 9mm 7mm;
+    background: var(--dark);
+  }
+
+  /* ── HEADER ── */
+  .hdr {
+    display: flex; align-items: flex-end;
+    justify-content: space-between;
+    border-bottom: 3px solid var(--gold);
+    padding-bottom: 4.5mm; margin-bottom: 4.5mm;
+  }
+  .hdr-l { display: flex; flex-direction: column; gap: 2px; }
+  .htag  { font-family: 'DM Mono',monospace; font-size: 7.5pt; color: var(--gold); letter-spacing: 3px; text-transform: uppercase; }
+  .htitl { font-family: 'Bebas Neue',sans-serif; font-size: 38pt; line-height: 0.88; color: var(--text); letter-spacing: 2px; }
+  .htitl span { color: var(--gold); }
+  .hsub  { font-family: 'DM Mono',monospace; font-size: 7pt; color: #888; margin-top: 2px; }
+  .hbadge { text-align: right; }
+  .bnum { font-family: 'Bebas Neue',sans-serif; font-size: 52pt; line-height:1; color: transparent; -webkit-text-stroke: 2px var(--gold); }
+  .bsub { font-size: 6.5pt; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+
+  /* ── GRID — 2 columns ── */
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 3mm; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--panel); border-radius: 2.5mm;
+    padding: 4mm 4.5mm; position: relative;
+    overflow: hidden; border: 1px solid var(--border);
+  }
+  .card::before { content:''; position:absolute; top:0;left:0;right:0; height:3px; }
+  .gold::before   { background: var(--gold); }
+  .orange::before { background: var(--accent); }
+  .green::before  { background: var(--green); }
+  .blue::before   { background: var(--blue); }
+  .red::before    { background: var(--red); }
+
+  .clbl {
+    font-family: 'DM Mono',monospace; font-size: 6pt;
+    letter-spacing: 3px; text-transform: uppercase; margin-bottom: 2.5mm;
+  }
+  .gold   .clbl { color: var(--gold); }
+  .orange .clbl { color: var(--accent); }
+  .green  .clbl { color: var(--green); }
+  .blue   .clbl { color: var(--blue); }
+  .red    .clbl { color: var(--red); }
+
+  .cttl {
+    font-family: 'Bebas Neue',sans-serif; font-size: 15pt;
+    letter-spacing: 1px; margin-bottom: 2.5mm; color: var(--text);
+  }
+
+  /* ── SPEC LIST ── */
+  .spl { list-style: none; }
+  .spl li {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1.2mm 0; border-bottom: 1px solid var(--border); font-size: 7.5pt;
+  }
+  .spl .k { color: var(--muted); font-size: 7pt; }
+  .spl .v { font-family: 'DM Mono',monospace; }
+  .spl .vg { color: var(--gold); }
+  .spl .vr { color: var(--green); }
+  .spl .vb { color: var(--blue); }
+
+  /* ── HBOX ── */
+  .hbox {
+    border-radius: 1.5mm; padding: 2mm 3.5mm;
+    font-size: 7pt; line-height: 1.6; margin-top: 2mm;
+    border-left: 3px solid;
+  }
+  .hbox.gld { background:#1c1800; border-color:var(--gold); }
+  .hbox.grn { background:#0b1c11; border-color:var(--green); }
+  .hbox.blu { background:#091422; border-color:var(--blue); }
+  .hbox strong { color: var(--gold); }
+
+  /* ── CFG ROW ── */
+  .cfgrow { display:flex; gap:2mm; margin-top:2mm; }
+  .cfgi {
+    flex:1; background:var(--mid); border-radius:2mm;
+    padding:2.5mm; text-align:center; border:1px solid var(--border);
+  }
+  .cfgi.chosen { border-color: var(--gold); }
+  .cfgn { font-family:'DM Mono',monospace; font-size:6.5pt; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
+  .cfgv { font-size:7pt; margin-top:1.5mm; line-height:1.7; }
+  .cv { color:var(--blue); } .ci { color:var(--green); } .cp { color:var(--gold); font-weight:600; }
+  .cfgnote { font-size:6pt; color:#444; margin-top:1mm; }
+  .cfgtag  { font-size:5.5pt; color:var(--gold); font-family:'DM Mono',monospace; letter-spacing:1px; margin-top:1mm; }
+
+  /* ── GEAR ── */
+  .gearwrap { display:flex; gap:3mm; align-items:flex-start; }
+  .gearcalc {
+    background:var(--mid); border-radius:2mm;
+    padding:2.5mm 3.5mm; font-family:'DM Mono',monospace;
+    font-size:7pt; line-height:1.8; margin-top:2mm;
+    border:1px solid var(--border);
+  }
+  .gearcalc .eq  { color:var(--green); }
+  .gearcalc .val { color:var(--gold); }
+
+  /* ── PARAM CHIPS ── */
+  .param-row { display:grid; grid-template-columns:repeat(4,1fr); gap:1.5mm; margin-top:2mm; }
+  .param-chip {
+    background:var(--mid); border-radius:1.5mm;
+    padding:1.5mm 2.5mm; border:1px solid var(--border);
+  }
+  .param-chip .pk { font-size:5.5pt; color:var(--muted); font-family:'DM Mono',monospace; letter-spacing:1px; text-transform:uppercase; margin-bottom:0.8mm; }
+  .param-chip .pv { font-family:'DM Mono',monospace; font-size:7pt; }
+  .param-chip .ps { font-family:'DM Mono',monospace; font-size:6.5pt; color:#777; margin-top:0.5mm; }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top:3.5mm; border-top:1px solid var(--border);
+    padding-top:2mm; display:flex; justify-content:space-between; align-items:center;
+  }
+  .fl { font-size:6pt; color:var(--muted); font-family:'DM Mono',monospace; }
+  .chips { display:flex; gap:1.5mm; flex-wrap:wrap; }
+  .chip {
+    background:var(--mid); border:1px solid var(--border);
+    border-radius:10mm; padding:0.8mm 2.5mm;
+    font-size:5.5pt; color:var(--muted); font-family:'DM Mono',monospace;
+  }
+
+  .mpptag {
+    display:inline-block; background:var(--gold); color:#000;
+    font-family:'DM Mono',monospace; font-size:6pt; font-weight:700;
+    padding:0.8mm 2mm; border-radius:1mm; margin-top:1.5mm;
+  }
+  .twocol { display:grid; grid-template-columns:1fr 1fr; gap:2.5mm; }
+</style>
+</head>
+<body>
+
+<div id="edit-bar">
+  <b>✏ Poster 1 — Electrical System</b>
+  <span>Every element is editable — click any text, label, or value to change it</span>
+  <div class="btns">
+    <button class="btn-save" onclick="alert('To save: File → Save Page As → Webpage, Complete\nOr use Ctrl+S')">💾 How to Save</button>
+    <button class="btn-print" onclick="window.print()">🖨 Print A3 / PDF</button>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="hdr">
+    <div class="hdr-l">
+      <div class="htag" contenteditable="true">DESN1000 · T1 2026 · Design Appraisal · Sheet 1 of 2</div>
+      <div class="htitl" contenteditable="true">ELECTRICAL <span>SYSTEM</span></div>
+      <div class="hsub" contenteditable="true">Team 22 — The Winners &nbsp;|&nbsp; Scale 1:10 &nbsp;|&nbsp; Track: 20m straight + chicane</div>
+    </div>
+    <div class="hbadge">
+      <div class="bnum" contenteditable="true">22</div>
+      <div class="bsub" contenteditable="true">Team Number</div>
+    </div>
+  </div>
+
+  <div class="grid">
+
+    <!-- ════════════════════════════════ -->
+    <!-- CARD 1 — CIRCUIT DIAGRAM        -->
+    <!-- ════════════════════════════════ -->
+    <div class="card gold">
+      <div class="clbl" contenteditable="true">01 — Full Electrical Circuit Diagram</div>
+      <div class="cttl" contenteditable="true">Solar Car Circuit — 2S2P · 2× Capacitors · 2× Rocker Switches · 2× F18 Motors</div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:2mm; margin-top:2mm;">
+        <div>
+          <div style="font-family:'DM Mono',monospace; font-size:5.5pt; color:var(--muted); letter-spacing:2px; text-transform:uppercase; margin-bottom:1mm;">Actual Circuit Diagram</div>
+          <img src="circuit_diagram2.png" style="width:100%; max-height:42mm; object-fit:contain;" />
+        </div>
+        <div>
+          <div style="font-family:'DM Mono',monospace; font-size:5.5pt; color:var(--muted); letter-spacing:2px; text-transform:uppercase; margin-bottom:1mm;">Schematic Diagram</div>
+          <svg viewBox="0 0 560 195" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-height:42mm;">
+            <defs>
+              <pattern id="g" width="16" height="16" patternUnits="userSpaceOnUse">
+                <path d="M16 0L0 0 0 16" fill="none" stroke="#1e1e1e" stroke-width="0.5"/>
+              </pattern>
+            </defs>
+            <rect width="560" height="195" fill="#141414" rx="3"/>
+            <rect width="560" height="195" fill="url(#g)" rx="3"/>
+
+            <!-- ─ SP1 ─ -->
+            <rect x="15" y="26" width="50" height="26" rx="2" fill="#0b1d0f" stroke="#4CAF7D" stroke-width="1.5"/>
+            <line x1="22" y1="32" x2="58" y2="32" stroke="#4CAF7D" stroke-width="0.8"/><line x1="22" y1="37" x2="58" y2="37" stroke="#4CAF7D" stroke-width="0.8"/>
+            <line x1="22" y1="42" x2="58" y2="42" stroke="#4CAF7D" stroke-width="0.8"/><line x1="22" y1="47" x2="58" y2="47" stroke="#4CAF7D" stroke-width="0.8"/>
+            <line x1="30" y1="26" x2="30" y2="52" stroke="#183020" stroke-width="0.5"/><line x1="40" y1="26" x2="40" y2="52" stroke="#183020" stroke-width="0.5"/><line x1="50" y1="26" x2="50" y2="52" stroke="#183020" stroke-width="0.5"/>
+            <text x="40" y="65" fill="#4CAF7D" font-size="7" text-anchor="middle" font-family="monospace" font-weight="bold">SP1</text>
+            <text x="40" y="73" fill="#555" font-size="6" text-anchor="middle" font-family="monospace">2V/0.65A</text>
+
+            <!-- ─ SP2 ─ -->
+            <rect x="15" y="88" width="50" height="26" rx="2" fill="#0b1d0f" stroke="#4CAF7D" stroke-width="1.5"/>
+            <line x1="22" y1="94" x2="58" y2="94" stroke="#4CAF7D" stroke-width="0.8"/><line x1="22" y1="99" x2="58" y2="99" stroke="#4CAF7D" stroke-width="0.8"/>
+            <line x1="22" y1="104" x2="58" y2="104" stroke="#4CAF7D" stroke-width="0.8"/><line x1="22" y1="109" x2="58" y2="109" stroke="#4CAF7D" stroke-width="0.8"/>
+            <line x1="30" y1="88" x2="30" y2="114" stroke="#183020" stroke-width="0.5"/><line x1="40" y1="88" x2="40" y2="114" stroke="#183020" stroke-width="0.5"/><line x1="50" y1="88" x2="50" y2="114" stroke="#183020" stroke-width="0.5"/>
+            <text x="40" y="128" fill="#4CAF7D" font-size="7" text-anchor="middle" font-family="monospace" font-weight="bold">SP2</text>
+            <text x="40" y="136" fill="#555" font-size="6" text-anchor="middle" font-family="monospace">2V/0.65A</text>
+            <line x1="40" y1="52" x2="40" y2="88" stroke="#F5C842" stroke-width="1.5"/>
+            <text x="46" y="73" fill="#F5C842" font-size="6" font-family="monospace">series</text>
+
+            <!-- ─ SP3 ─ -->
+            <rect x="80" y="26" width="50" height="26" rx="2" fill="#0b1d0f" stroke="#4CAF7D" stroke-width="1.5"/>
+            <line x1="87" y1="32" x2="123" y2="32" stroke="#4CAF7D" stroke-width="0.8"/><line x1="87" y1="37" x2="123" y2="37" stroke="#4CAF7D" stroke-width="0.8"/>
+            <line x1="87" y1="42" x2="123" y2="42" stroke="#4CAF7D" stroke-width="0.8"/><line x1="87" y1="47" x2="123" y2="47" stroke="#4CAF7D" stroke-width="0.8"/>
+            <line x1="95" y1="26" x2="95" y2="52" stroke="#183020" stroke-width="0.5"/><line x1="105" y1="26" x2="105" y2="52" stroke="#183020" stroke-width="0.5"/><line x1="115" y1="26" x2="115" y2="52" stroke="#183020" stroke-width="0.5"/>
+            <text x="105" y="65" fill="#4CAF7D" font-size="7" text-anchor="middle" font-family="monospace" font-weight="bold">SP3</text>
+            <text x="105" y="73" fill="#555" font-size="6" text-anchor="middle" font-family="monospace">2V/0.65A</text>
+
+            <!-- ─ SP4 ─ -->
+            <rect x="80" y="88" width="50" height="26" rx="2" fill="#0b1d0f" stroke="#4CAF7D" stroke-width="1.5"/>
+            <line x1="87" y1="94" x2="123" y2="94" stroke="#4CAF7D" stroke-width="0.8"/><line x1="87" y1="99" x2="123" y2="99" stroke="#4CAF7D" stroke-width="0.8"/>
+            <line x1="87" y1="104" x2="123" y2="104" stroke="#4CAF7D" stroke-width="0.8"/><line x1="87" y1="109" x2="123" y2="109" stroke="#4CAF7D" stroke-width="0.8"/>
+            <line x1="95" y1="88" x2="95" y2="114" stroke="#183020" stroke-width="0.5"/><line x1="105" y1="88" x2="105" y2="114" stroke="#183020" stroke-width="0.5"/><line x1="115" y1="88" x2="115" y2="114" stroke="#183020" stroke-width="0.5"/>
+            <text x="105" y="128" fill="#4CAF7D" font-size="7" text-anchor="middle" font-family="monospace" font-weight="bold">SP4</text>
+            <text x="105" y="136" fill="#555" font-size="6" text-anchor="middle" font-family="monospace">2V/0.65A</text>
+            <line x1="105" y1="52" x2="105" y2="88" stroke="#F5C842" stroke-width="1.5"/>
+
+            <!-- parallel buses -->
+            <line x1="40" y1="26" x2="105" y2="26" stroke="#F5C842" stroke-width="1.5"/>
+            <line x1="40" y1="114" x2="105" y2="114" stroke="#4A9EFF" stroke-width="1.5"/>
+            <line x1="105" y1="26" x2="195" y2="26" stroke="#F5C842" stroke-width="1.5"/>
+            <line x1="105" y1="114" x2="195" y2="114" stroke="#4A9EFF" stroke-width="1.5"/>
+
+            <!-- 2S2P label -->
+            <rect x="42" y="145" width="108" height="14" rx="2" fill="#201c00"/>
+            <text x="96" y="155" fill="#F5C842" font-size="7.5" text-anchor="middle" font-family="monospace" font-weight="bold">2S2P → 4V / 1.3A / 5.2W</text>
+
+            <!-- ─ ROCKER SW1 ─ -->
+            <line x1="195" y1="26" x2="212" y2="26" stroke="#F5C842" stroke-width="1.5"/>
+            <rect x="212" y="18" width="18" height="16" rx="2" fill="#1a0e00" stroke="#FF6B2B" stroke-width="1.5"/>
+            <line x1="213" y1="22" x2="229" y2="22" stroke="#FF6B2B" stroke-width="2"/>
+            <line x1="221" y1="18" x2="221" y2="22" stroke="#FF6B2B" stroke-width="1"/>
+            <text x="221" y="13" fill="#FF6B2B" font-size="7" text-anchor="middle" font-family="monospace" font-weight="bold">SW1</text>
+            <text x="221" y="8" fill="#555" font-size="5.5" text-anchor="middle" font-family="monospace">ROCKER</text>
+            <line x1="230" y1="26" x2="248" y2="26" stroke="#F5C842" stroke-width="1.5"/>
+
+            <!-- ─ ROCKER SW2 ─ -->
+            <line x1="195" y1="114" x2="212" y2="114" stroke="#4A9EFF" stroke-width="1.5"/>
+            <rect x="212" y="106" width="18" height="16" rx="2" fill="#001020" stroke="#4A9EFF" stroke-width="1.5"/>
+            <line x1="213" y1="110" x2="229" y2="110" stroke="#4A9EFF" stroke-width="2"/>
+            <line x1="221" y1="106" x2="221" y2="110" stroke="#4A9EFF" stroke-width="1"/>
+            <text x="221" y="130" fill="#4A9EFF" font-size="7" text-anchor="middle" font-family="monospace" font-weight="bold">SW2</text>
+            <text x="221" y="137" fill="#555" font-size="5.5" text-anchor="middle" font-family="monospace">ROCKER</text>
+            <line x1="230" y1="114" x2="248" y2="114" stroke="#4A9EFF" stroke-width="1.5"/>
+
+            <!-- ─ CAPACITOR C1 ─ -->
+            <line x1="248" y1="26" x2="264" y2="26" stroke="#F5C842" stroke-width="1.5"/>
+            <line x1="264" y1="15" x2="264" y2="37" stroke="#F5C842" stroke-width="2.5"/>
+            <line x1="269" y1="15" x2="269" y2="37" stroke="#F5C842" stroke-width="2.5"/>
+            <line x1="269" y1="26" x2="285" y2="26" stroke="#F5C842" stroke-width="1.5"/>
+            <text x="256" y="11" fill="#F5C842" font-size="8" font-family="monospace">+</text>
+            <text x="271" y="11" fill="#4A9EFF" font-size="8" font-family="monospace">−</text>
+            <text x="266" y="48" fill="#F5C842" font-size="7" text-anchor="middle" font-family="monospace" font-weight="bold">C1</text>
+            <text x="266" y="56" fill="#888" font-size="6" text-anchor="middle" font-family="monospace">5V / 1F</text>
+            <line x1="266" y1="37" x2="266" y2="65" stroke="#4A9EFF" stroke-width="1"/>
+            <line x1="266" y1="65" x2="200" y2="65" stroke="#4A9EFF" stroke-width="1"/>
+            <line x1="200" y1="65" x2="200" y2="114" stroke="#4A9EFF" stroke-width="1"/>
+            <line x1="200" y1="114" x2="212" y2="114" stroke="#4A9EFF" stroke-width="0.5" stroke-dasharray="2,2"/>
+
+            <!-- ─ CAPACITOR C2 ─ -->
+            <line x1="285" y1="26" x2="300" y2="26" stroke="#F5C842" stroke-width="1.5"/>
+            <line x1="300" y1="15" x2="300" y2="37" stroke="#F5C842" stroke-width="2.5"/>
+            <line x1="305" y1="15" x2="305" y2="37" stroke="#F5C842" stroke-width="2.5"/>
+            <line x1="305" y1="26" x2="325" y2="26" stroke="#F5C842" stroke-width="1.5"/>
+            <text x="292" y="11" fill="#F5C842" font-size="8" font-family="monospace">+</text>
+            <text x="307" y="11" fill="#4A9EFF" font-size="8" font-family="monospace">−</text>
+            <text x="302" y="48" fill="#F5C842" font-size="7" text-anchor="middle" font-family="monospace" font-weight="bold">C2</text>
+            <text x="302" y="56" fill="#888" font-size="6" text-anchor="middle" font-family="monospace">5V / 1F</text>
+            <line x1="302" y1="37" x2="302" y2="65" stroke="#4A9EFF" stroke-width="1"/>
+            <line x1="266" y1="65" x2="302" y2="65" stroke="#4A9EFF" stroke-width="1"/>
+            <text x="284" y="77" fill="#888" font-size="6" text-anchor="middle" font-family="monospace">C1‖C2 parallel</text>
+            <text x="284" y="84" fill="#F5C842" font-size="6" text-anchor="middle" font-family="monospace">→ 5V / 2F total</text>
+
+            <!-- ─ MOTOR M1 ─ -->
+            <line x1="325" y1="26" x2="348" y2="26" stroke="#F5C842" stroke-width="1.5"/>
+            <circle cx="366" cy="26" r="16" fill="#0a0a1e" stroke="#4A9EFF" stroke-width="2"/>
+            <text x="366" y="22" fill="#4A9EFF" font-size="8.5" text-anchor="middle" font-family="monospace" font-weight="bold">M1</text>
+            <text x="366" y="32" fill="#555" font-size="6" text-anchor="middle" font-family="monospace">F-18FS</text>
+            <line x1="382" y1="26" x2="410" y2="26" stroke="#4A9EFF" stroke-width="1.5"/>
+
+            <!-- ─ MOTOR M2 ─ -->
+            <line x1="325" y1="26" x2="348" y2="80" stroke="#F5C842" stroke-width="1.5"/>
+            <circle cx="366" cy="90" r="16" fill="#0a0a1e" stroke="#4A9EFF" stroke-width="2"/>
+            <text x="366" y="86" fill="#4A9EFF" font-size="8.5" text-anchor="middle" font-family="monospace" font-weight="bold">M2</text>
+            <text x="366" y="96" fill="#555" font-size="6" text-anchor="middle" font-family="monospace">F-18FS</text>
+            <line x1="382" y1="90" x2="410" y2="90" stroke="#4A9EFF" stroke-width="1.5"/>
+
+            <!-- return rails -->
+            <line x1="410" y1="26" x2="435" y2="26" stroke="#4A9EFF" stroke-width="1.5"/>
+            <line x1="410" y1="90" x2="435" y2="90" stroke="#4A9EFF" stroke-width="1.5"/>
+            <line x1="435" y1="26" x2="435" y2="114" stroke="#4A9EFF" stroke-width="1.5"/>
+            <line x1="435" y1="90" x2="435" y2="114" stroke="#4A9EFF" stroke-width="0.8" stroke-dasharray="3,2"/>
+            <line x1="248" y1="114" x2="435" y2="114" stroke="#4A9EFF" stroke-width="1.5"/>
+            <text x="366" y="115" fill="#4A9EFF" font-size="6.5" text-anchor="middle" font-family="monospace">Dual motor — parallel</text>
+            <text x="366" y="123" fill="#555" font-size="6" text-anchor="middle" font-family="monospace">One per axle</text>
+
+            <!-- LEGEND -->
+            <rect x="448" y="10" width="105" height="115" rx="2" fill="#0e0e0e" stroke="#2a2a2a" stroke-width="1"/>
+            <text x="500" y="22" fill="#555" font-size="7" text-anchor="middle" font-family="monospace" font-weight="bold">LEGEND</text>
+            <rect x="455" y="28" width="10" height="7" fill="#0b1d0f" stroke="#4CAF7D" stroke-width="1"/>
+            <text x="469" y="35" fill="#ccc" font-size="6.5" font-family="monospace">Solar Panel (2V/0.65A ea.)</text>
+            <line x1="455" y1="45" x2="465" y2="45" stroke="#F5C842" stroke-width="1.5"/>
+            <text x="469" y="48" fill="#ccc" font-size="6.5" font-family="monospace">+ve Rail</text>
+            <line x1="455" y1="56" x2="465" y2="56" stroke="#4A9EFF" stroke-width="1.5"/>
+            <text x="469" y="59" fill="#ccc" font-size="6.5" font-family="monospace">−ve Rail</text>
+            <rect x="455" y="63" width="10" height="8" fill="#1a0e00" stroke="#FF6B2B" stroke-width="1"/>
+            <text x="469" y="70" fill="#ccc" font-size="6.5" font-family="monospace">Dual Rocker Switch</text>
+            <line x1="455" y1="80" x2="459" y2="80" stroke="#F5C842" stroke-width="1.2"/>
+            <line x1="459" y1="76" x2="459" y2="84" stroke="#F5C842" stroke-width="2"/>
+            <line x1="463" y1="76" x2="463" y2="84" stroke="#F5C842" stroke-width="2"/>
+            <line x1="463" y1="80" x2="467" y2="80" stroke="#F5C842" stroke-width="1.2"/>
+            <text x="469" y="83" fill="#ccc" font-size="6.5" font-family="monospace">Capacitor 5V/1F ×2</text>
+            <circle cx="460" cy="95" r="5.5" fill="none" stroke="#4A9EFF" stroke-width="1.5"/>
+            <text x="460" y="98" fill="#4A9EFF" font-size="6" text-anchor="middle" font-family="monospace">M</text>
+            <text x="469" y="98" fill="#ccc" font-size="6.5" font-family="monospace">F-18FS-2852 DC Motor</text>
+            <rect x="455" y="106" width="90" height="12" rx="1" fill="#201c00"/>
+            <text x="500" y="114" fill="#F5C842" font-size="6.5" text-anchor="middle" font-family="monospace" font-weight="bold">Config: 2S2P · 4V · 1.3A</text>
+          </svg>
+        </div>
+      </div>
+
+      <div class="param-row">
+        <div class="param-chip">
+          <div class="pk" contenteditable="true">Each Panel</div>
+          <div class="pv" style="color:var(--green);" contenteditable="true">Voc=2.33V, Isc=0.65A</div>
+          <div class="ps" contenteditable="true">MPP: 1.93V / 0.56A / 1.08W</div>
+        </div>
+        <div class="param-chip">
+          <div class="pk" contenteditable="true">Array (2S2P)</div>
+          <div class="pv" style="color:var(--gold);" contenteditable="true">V=4V, I=1.3A, P=5.2W</div>
+          <div class="ps" contenteditable="true">Nearest to MPP operating point</div>
+        </div>
+        <div class="param-chip">
+          <div class="pk" contenteditable="true">Capacitors ×2</div>
+          <div class="pv" style="color:var(--blue);" contenteditable="true">Each: 5V / 1F (parallel)</div>
+          <div class="ps" contenteditable="true">Combined: 5V / 2F total</div>
+        </div>
+        <div class="param-chip">
+          <div class="pk" contenteditable="true">F-18FS Motors ×2</div>
+          <div class="pv" style="color:var(--blue);" contenteditable="true">1.5–6V, nominal 2.4V</div>
+          <div class="ps" contenteditable="true">Max eff: 6700RPM, 1.87mN·m</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════ -->
+    <!-- CARD 2 — COMPONENT SPECS        -->
+    <!-- ════════════════════════════════ -->
+    <div class="card green">
+      <div class="clbl" contenteditable="true">02 — Component Parameters</div>
+      <div class="cttl" contenteditable="true">Full Specs</div>
+      <ul class="spl">
+        <li><span class="k" contenteditable="true">Panels (qty)</span><span class="v vg" contenteditable="true">4×</span></li>
+        <li><span class="k" contenteditable="true">Panel voltage (Voc)</span><span class="v vg" contenteditable="true">2.33 V</span></li>
+        <li><span class="k" contenteditable="true">Panel current (Isc)</span><span class="v" contenteditable="true">0.65 A</span></li>
+        <li><span class="k" contenteditable="true">MPP voltage</span><span class="v vg" contenteditable="true">1.93 V</span></li>
+        <li><span class="k" contenteditable="true">MPP current</span><span class="v" contenteditable="true">0.56 A</span></li>
+        <li><span class="k" contenteditable="true">MPP power (×1)</span><span class="v vg" contenteditable="true">1.08 W</span></li>
+        <li><span class="k" contenteditable="true">Config</span><span class="v" contenteditable="true">2S2P</span></li>
+        <li><span class="k" contenteditable="true">Array voltage</span><span class="v vg" contenteditable="true">4 V</span></li>
+        <li><span class="k" contenteditable="true">Array current</span><span class="v" contenteditable="true">1.3 A</span></li>
+        <li><span class="k" contenteditable="true">Array power</span><span class="v vg" contenteditable="true">5.2 W</span></li>
+        <li><span class="k" contenteditable="true">Capacitors</span><span class="v vb" contenteditable="true">2× (5V / 1F each)</span></li>
+        <li><span class="k" contenteditable="true">Cap combined</span><span class="v" contenteditable="true">5V / 2F (parallel)</span></li>
+        <li><span class="k" contenteditable="true">Switches</span><span class="v" contenteditable="true">2× dual rocker</span></li>
+        <li><span class="k" contenteditable="true">Motors</span><span class="v vb" contenteditable="true">2× F-18FS-2852</span></li>
+        <li><span class="k" contenteditable="true">Motor voltage</span><span class="v vg" contenteditable="true">1.5–6V (nom. 2.4V)</span></li>
+        <li><span class="k" contenteditable="true">No-load speed</span><span class="v" contenteditable="true">8,000 RPM @ 2.4V</span></li>
+        <li><span class="k" contenteditable="true">Max eff. speed</span><span class="v" contenteditable="true">6,700 RPM</span></li>
+        <li><span class="k" contenteditable="true">Max eff. torque</span><span class="v vg" contenteditable="true">1.87 mN·m (19.1 g·cm)</span></li>
+        <li><span class="k" contenteditable="true">Stall torque</span><span class="v" contenteditable="true">11.37 mN·m (116 g·cm)</span></li>
+        <li><span class="k" contenteditable="true">Motor efficiency</span><span class="v vg" contenteditable="true">63% (max)</span></li>
+        <li><span class="k" contenteditable="true">Motor weight</span><span class="v" contenteditable="true">32g (approx.)</span></li>
+      </ul>
+    </div>
+
+    <!-- ════════════════════════════════ -->
+    <!-- CARD 3 — IV CURVES              -->
+    <!-- ════════════════════════════════ -->
+    <div class="card blue">
+      <div class="clbl" contenteditable="true">03 — Solar Array I-V Curve</div>
+      <div class="cttl" contenteditable="true">2S2P Array Performance — Outdoor & Indoor</div>
+      <img src="circuit_diagram.png" style="width:100%; max-height:55mm; object-fit:contain; margin-top:2mm;" />
+      <div class="mpptag" contenteditable="true">
+        2S2P chosen: array output (4V) ≈ 2× MPP per panel (1.93V) → array operates at maximum power point → full 5.2W delivered
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════ -->
+    <!-- CARD 4 — CONFIG COMPARISON      -->
+    <!-- ════════════════════════════════ -->
+    <div class="card gold">
+      <div class="clbl" contenteditable="true">04 — Configuration Comparison</div>
+      <div class="cttl" contenteditable="true">Why 2S2P?</div>
+      <div class="cfgrow">
+        <div class="cfgi">
+          <div class="cfgn" contenteditable="true">All Series</div>
+          <div class="cfgv"><div class="cv" contenteditable="true">V = 8V</div><div class="ci" contenteditable="true">I = 0.65A</div><div class="cp" contenteditable="true">P = 5.2W</div></div>
+          <div class="cfgnote" contenteditable="true">Exceeds motor range (max 6V)</div>
+        </div>
+        <div class="cfgi chosen">
+          <div class="cfgn" contenteditable="true">2S2P ★</div>
+          <div class="cfgv"><div class="cv" contenteditable="true">V = 4V</div><div class="ci" contenteditable="true">I = 1.3A</div><div class="cp" contenteditable="true">P = 5.2W</div></div>
+          <div class="cfgtag" contenteditable="true">SELECTED — near MPP</div>
+        </div>
+        <div class="cfgi">
+          <div class="cfgn" contenteditable="true">All Parallel</div>
+          <div class="cfgv"><div class="cv" contenteditable="true">V = 2V</div><div class="ci" contenteditable="true">I = 2.6A</div><div class="cp" contenteditable="true">P = 5.2W</div></div>
+          <div class="cfgnote" contenteditable="true">Too low for motor efficiency</div>
+        </div>
+      </div>
+      <div class="hbox gld" contenteditable="true"><strong>MPP link:</strong> Single panel MPP = 1.93V × 2 series = 3.86V ≈ 4V array output. 2S2P operates array at MPP delivering full 5.2W. Motor nominal is 2.4V — 4V is within its 1.5–6V operating range at higher efficiency.</div>
+    </div>
+
+    <!-- ════════════════════════════════ -->
+    <!-- CARD 5 — GEAR RATIO             -->
+    <!-- ════════════════════════════════ -->
+    <div class="card orange">
+      <div class="clbl" contenteditable="true">05 — Drive System & Gear Ratio</div>
+      <div class="cttl" contenteditable="true">Gear Selection & Torque Validation (F-18FS-2852 Datasheet)</div>
+      <div class="gearwrap">
+        <svg viewBox="0 0 140 105" width="108" style="flex-shrink:0;" xmlns="http://www.w3.org/2000/svg">
+          <rect width="140" height="105" fill="#111" rx="2"/>
+          <circle cx="32" cy="65" r="13" fill="#111" stroke="#FF6B2B" stroke-width="2"/>
+          <circle cx="32" cy="65" r="8" fill="#FF6B2B" fill-opacity="0.1"/>
+          <circle cx="32" cy="52" r="2" fill="#FF6B2B"/><circle cx="32" cy="78" r="2" fill="#FF6B2B"/>
+          <circle cx="19" cy="65" r="2" fill="#FF6B2B"/><circle cx="45" cy="65" r="2" fill="#FF6B2B"/>
+          <circle cx="23" cy="56" r="2" fill="#FF6B2B"/><circle cx="41" cy="56" r="2" fill="#FF6B2B"/>
+          <circle cx="23" cy="74" r="2" fill="#FF6B2B"/><circle cx="41" cy="74" r="2" fill="#FF6B2B"/>
+          <text x="32" y="69" fill="#FF6B2B" font-size="7" text-anchor="middle" font-family="monospace" font-weight="bold">10T</text>
+          <text x="32" y="92" fill="#888" font-size="6" text-anchor="middle" font-family="monospace">Motor gear</text>
+          <circle cx="102" cy="58" r="36" fill="#111" stroke="#F5C842" stroke-width="2"/>
+          <circle cx="102" cy="58" r="28" fill="#F5C842" fill-opacity="0.05"/>
+          <circle cx="102" cy="58" r="5" fill="#F5C842"/>
+          <text x="102" y="56" fill="#F5C842" font-size="8" text-anchor="middle" font-family="monospace" font-weight="bold">60T</text>
+          <text x="102" y="66" fill="#888" font-size="6" text-anchor="middle" font-family="monospace">Axle gear</text>
+          <line x1="45" y1="65" x2="66" y2="58" stroke="#444" stroke-width="0.8" stroke-dasharray="2,2"/>
+          <text x="70" y="102" fill="#F5C842" font-size="9" text-anchor="middle" font-family="monospace" font-weight="bold">Ratio = 6:1</text>
+        </svg>
+        <div style="flex:1;">
+          <div class="gearcalc">
+            <div><span class="val" contenteditable="true">Gear Ratio</span> = Axle ÷ Motor = <span class="val" contenteditable="true">60 ÷ 10 = 6:1</span></div>
+            <div class="eq" contenteditable="true">Motor max-eff. torque (datasheet) = 1.87 mN·m @ 6700 RPM</div>
+            <div class="eq" contenteditable="true">Axle torque = 1.87 × 6 = 11.22 mN·m (per motor)</div>
+            <div class="eq" contenteditable="true">Dual motor axle torque = 11.22 × 2 = 22.44 mN·m total</div>
+            <div style="margin-top:2px;"><span class="val" contenteditable="true">Axle RPM</span> = <span contenteditable="true">6700 ÷ 6 = 1,117 RPM</span></div>
+            <div class="eq" contenteditable="true">Wheel Ø=50mm → v = π×0.05×1117/60 ≈ 2.9 m/s</div>
+            <div class="eq" contenteditable="true">Stall torque per motor = 11.37 mN·m × 6 = 68.2 mN·m at axle</div>
+            <div style="margin-top:2px;" contenteditable="true">Motor op. range: 1.5–6V | Nominal: 2.4V | Operating @ 4V → above nominal → higher speed & torque</div>
+          </div>
+          <div class="hbox" style="background:#1a0d00;border-color:var(--accent);margin-top:1.5mm;font-size:6.5pt;" contenteditable="true"><strong style="color:var(--accent);">Why 6:1 & F-18FS:</strong> 20m track favours acceleration. 6:1 gives 22.4 mN·m combined axle torque — sufficient to overcome rolling resistance and launch reliably under variable solar conditions. F-18FS chosen over TT motor (lower torque) and N20 (insufficient at 4V) based on datasheet torque values and 1.5–6V operating range matching our 4V array.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════ -->
+    <!-- CARD 6 — NAVIGATION             -->
+    <!-- ════════════════════════════════ -->
+    <div class="card green">
+      <div class="clbl" contenteditable="true">06 — Navigation System</div>
+      <div class="cttl" contenteditable="true">Track Guidance</div>
+      <svg viewBox="0 0 155 72" width="100%" style="max-height:25mm;" xmlns="http://www.w3.org/2000/svg">
+        <rect width="155" height="72" fill="#111" rx="2"/>
+        <rect x="16" y="20" width="122" height="26" rx="5" fill="#1a1a2e" stroke="#777" stroke-width="1.2"/>
+        <line x1="0" y1="57" x2="155" y2="57" stroke="#F5C842" stroke-width="2.5"/>
+        <line x1="45" y1="46" x2="45" y2="57" stroke="#4A9EFF" stroke-width="1.5"/>
+        <circle cx="45" cy="60" r="3.5" fill="#4A9EFF"/>
+        <line x1="110" y1="46" x2="110" y2="57" stroke="#4A9EFF" stroke-width="1.5"/>
+        <circle cx="110" cy="60" r="3.5" fill="#4A9EFF"/>
+        <text x="77" y="12" fill="#777" font-size="6.5" text-anchor="middle" font-family="monospace">Bottom view</text>
+        <text x="45" y="69" fill="#4A9EFF" font-size="6" text-anchor="middle" font-family="monospace">Ø6mm brg</text>
+        <text x="110" y="69" fill="#4A9EFF" font-size="6" text-anchor="middle" font-family="monospace">Ø6mm brg</text>
+        <text x="77" y="64" fill="#F5C842" font-size="6" text-anchor="middle" font-family="monospace">Track slot</text>
+      </svg>
+      <p style="font-size:7pt;line-height:1.55;color:#bbb;margin-top:1.5mm;" contenteditable="true">Two Ø6mm ball bearings on vertical poles beneath the chassis ride in the track slot. Passive low-friction guidance through the chicane. Pole spacing: ~95mm centre-to-centre.</p>
+    </div>
+
+    <!-- ════════════════════════════════ -->
+    <!-- CARD 7 — CAPACITOR CURVE        -->
+    <!-- ════════════════════════════════ -->
+    <div class="card gold" style="grid-column: span 2;">
+      <div class="clbl" contenteditable="true">07 — Capacitor Charge / Discharge Curve</div>
+      <div class="cttl" contenteditable="true">Capacitor Performance — 5V / 2F Combined (C1 ‖ C2)</div>
+      <img src="capacitor_curve.png" style="width:100%; max-height:60mm; object-fit:contain; margin-top:2mm;" />
+      <div class="mpptag" contenteditable="true">
+        Capacitors charge to 5V in 16s — providing an energy buffer to supplement solar input at race start. Full discharge to motors takes 37s, sustaining drive during low-light conditions.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="fl" contenteditable="true">DESN1000 T1 2026 · Group 22 · The Winners · Poster 1/2 — Electrical System & Technical Specifications</div>
+    <div class="chips">
+      <span class="chip" contenteditable="true">Daksh Patel z5760390</span>
+      <span class="chip" contenteditable="true">Rupan Senthilnathan z5767338</span>
+      <span class="chip" contenteditable="true">Isabella Xu z5767513</span>
+      <span class="chip" contenteditable="true">Usama Al-Shukaili z5676972</span>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
